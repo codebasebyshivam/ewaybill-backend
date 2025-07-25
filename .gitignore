@@ -1,0 +1,49 @@
+# Node modules (don't track installed packages)
+node_modules/
+
+# Environment variables (never commit secrets!)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Runtime files
+dist/
+build/
+.cache/
+.pnpm-debug.log
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.swp
+
+# Coverage/test reports
+coverage/
+.nyc_output/
+
+# PM2 process manager
+pids/
+*.pid
+*.seed
+
+# Optional: output files from tooling
+*.tgz
+*.tar.gz
+
+# Optional: Docker files
+docker-compose.override.yml
+
+# Optional: if using Swagger autogen
+swagger-output.json
