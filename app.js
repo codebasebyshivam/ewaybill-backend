@@ -1,31 +1,53 @@
 import express from 'express';
+// created express application
 const app = express();
-import cors from 'cors';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
 dotenv.config();
+// built in package middlewares imports
+
+import helmet from 'helmet';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
-import { errorMiddleware,createError } from './middleware/error.handler.js';
+import { errorMiddleware, createError } from './middleware/error.handler.js';
+import handleLogin from './controllers/login.js';
+import handleCompanies from './controllers/companies.js';
+import handleFinancialYears from './controllers/financial.years.js';
 
 // server port
 const SERVER_PORT = process.env.SERVER_PORT || 5500;
 
-// cors config
-const CORSOPTION = {
-  origin: ['http://localhost:5178', `http://192.168.1.37:5178`],
+// built in middleware
+app.use(cookieParser());
+
+// defined cors policy
+const corsoption = {
+  origin: [`http://localhost:5178`],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
-  allowedHeaders: ['Content-type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
-// built in middlewares
-app.use(cors(CORSOPTION));
-app.use(cookieParser());
+// Enable CORS
+app.use(cors(corsoption));
+// Handle preflight requests
+// app.options('*', cors(corsoption));
+
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
 
+// routes
+app.get('/api/companies-list', handleCompanies);
+app.post('/api/financial-years', handleFinancialYears);
+app.post('/api/login', handleLogin);
 
+// Catch wrong routes (404 handler)
+app.use((req, res, next) => {
+  next(createError('Route Not Matched', 404, 'NOT_FOUND'));
+});
+
+// custom middleware
+app.use(errorMiddleware); //error middleware
 
 // server created
 const server = http.createServer(app);
@@ -38,53 +60,3 @@ server.listen(SERVER_PORT, '0.0.0.0', (error) => {
     `server is listening at port ${server_details.port} and ip address ${server_details.address}`
   );
 });
-
-// Graceful SHUTDOWN logic hit when user press ctrl + c
-process.on('SIGINT', async () => {
-  console.log(`Shutting down the server`);
-  server.close(() => {
-    console.log('server closed.');
-    process.exit(0);  // Exit the process gracefully
-  });
-})
-
-
-// process is closed by operation system
-process.on('SIGTERM', async () => {
-  console.log(`Shutting down the server`);
-  server.close(() => {
-    console.log('server closed.');
-    process.exit(0);  // Exit the process gracefully
-  });
-});
-
-// The uncaughtException event is emitted when an exception is thrown but not caught by a try-catch block anywhere in the application
-process.on('uncaughtException', async (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);  // Exit the process with an error status code
-});
-
-
-// The unhandledRejection event is triggered when a Promise is rejected and there’s no .catch() block to handle it.
-process.on('unhandledRejection', async (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
-  process.exit(1);  // Exit the process with an error status code
-});
-
-
-
-// routes
-
-
-
-
-
-// Catch wrong routes (404 handler)
-app.use((req, res, next) => {
-  next(createError('Route Not Matched', 404, 'NOT_FOUND'));
-});
-
-
-
-// custom middleware
-app.use(errorMiddleware); //error middleware
