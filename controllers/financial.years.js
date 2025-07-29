@@ -1,7 +1,7 @@
 import { createError } from '../middleware/error.handler.js';
 import queryDatabase from '../services/sql.query.executor.js';
 
-const handleFinancialYears = async (req, res) => {
+const handleFinancialYears = async (req, res, next) => {
   try {
     const { id } = req.body;
     // Construct the SQL query string
@@ -15,12 +15,11 @@ const handleFinancialYears = async (req, res) => {
     return res.status(200).json({ financial_years: financialYears });
   } catch (error) {
     console.error(`error in fetching  financial years ${error}`);
-    const errorResponse = createError(
+    return next(createError(
       'failed to load financial year',
       500,
       'SERVER_ERROR'
-    );
-    return res.status(500).json(errorResponse);
+    ));
   }
 };
 

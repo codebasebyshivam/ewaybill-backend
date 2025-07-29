@@ -10,11 +10,13 @@ const generateToken = (data) => {
       gst: data.gst,
       cmp_year: data.db_name,
       isAdmin: data.isAdmin,
+      company: data.company, // Include company in the payload
+      financial_year:data.FY
     };
 
     return jwt.sign(payload, process.env.SECRET_KEY, {
       issuer: 'Kats Infotech PVT LTD',
-      expiresIn: '24h',
+      expiresIn: data.rememberMe ? '7d' : '24h', // Use 7 days if rememberMe is true, otherwise 1 hour
     });
   } catch (err) {
     console.error('Token generation failed:', err);

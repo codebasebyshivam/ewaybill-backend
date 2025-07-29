@@ -1,7 +1,7 @@
 import { createError } from '../middleware/error.handler.js';
 import queryDatabase from '../services/sql.query.executor.js';
 
-const handleCompanies = async (req, res) => {
+const handleCompanies = async (req, res, next) => {
   try {
     // Construct the SQL query string
     const query = `select id, m_compname [Company] from comp_details order by m_compname`;
@@ -9,13 +9,12 @@ const handleCompanies = async (req, res) => {
 
     return res.status(200).json({ success: true, cmp_list: companies });
   } catch (error) {
-    console.error(`error in fetching companies with financial year ${error}`);
-    const errorResponse = createError(
+    console.error('Error fetching companies:', error);
+    return next(createError(
       'failed to load companies',
       500,
       'SERVER_ERROR'
-    );
-    return res.status(500).json(errorResponse);
+    ))
   }
 };
 
